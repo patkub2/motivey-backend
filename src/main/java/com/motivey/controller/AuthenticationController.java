@@ -1,5 +1,6 @@
 package com.motivey.controller;
 
+import com.motivey.config.TokenProvider;
 import com.motivey.dto.LoginDto;
 import com.motivey.dto.UserRegistrationDto;
 import com.motivey.exception.UserAlreadyExistsException;
@@ -9,6 +10,10 @@ import com.motivey.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +29,11 @@ public class AuthenticationController {
     private UserRepository userRepository;
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private TokenProvider tokenProvider;
     public AuthenticationController(UserService userService) {
         this.userService = userService;
     }
@@ -43,13 +51,22 @@ public class AuthenticationController {
         }
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
-        // Authentication logic here
-        // ...
+        try {
+            // Authenticate user
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginDto.getEmail(),
+                            loginDto.getPassword()
+                    )
+            );
 
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+            // Generate JWT
+            String token = tokenProvider.generateToken(authentication);
+            return ResponseEntity.ok("Bearer " + token);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>("Invalid email/password supplied", HttpStatus.UNAUTHORIZED);
+        }
     }
-
 }
