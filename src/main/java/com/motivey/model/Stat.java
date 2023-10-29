@@ -29,7 +29,5 @@ public class Stat {
     @Column(name = "max_exp", nullable = false, columnDefinition = "INT DEFAULT 4")
     private Integer maxExp = 4;
 
-    public enum StatType {
-        INT, STR, AGI, VIT
-    }
+
 }

@@ -2,10 +2,7 @@ package com.motivey.service;
 
 import com.motivey.dto.UserRegistrationDto;
 import com.motivey.exception.UserAlreadyExistsException;
-import com.motivey.model.Role;
-import com.motivey.model.Stat;
-import com.motivey.model.StatId;
-import com.motivey.model.User;
+import com.motivey.model.*;
 import com.motivey.repository.RoleRepository;
 import com.motivey.repository.StatRepository;
 import com.motivey.repository.UserRepository;
@@ -45,7 +42,7 @@ public class UserServiceImpl implements UserService {
         user = userRepository.save(user); // Save the user to ensure it has an ID before creating stats
 
         // Add default stats to the user
-        for (Stat.StatType type : Stat.StatType.values()) {
+        for (StatType type : StatType.values()) {
             Stat stat = new Stat();
             StatId statId = new StatId();
             statId.setUserId(user.getId());

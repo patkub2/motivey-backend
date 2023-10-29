@@ -31,11 +31,8 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('int', 'str', 'agi', 'vit')")
-    private Stat.StatType type;
+    private StatType type;
 
     private String icon;
 
-    public enum Section {
-        HABBITS, CHALLENGES, GOALS
-    }
 }

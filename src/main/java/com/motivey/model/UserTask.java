@@ -9,19 +9,22 @@ import javax.persistence.*;
 @Table(name = "user_tasks")
 @Getter
 @Setter
-@IdClass(UserTaskId.class)
 public class UserTask {
 
-    @Id
+    @EmbeddedId
+    private UserTaskId id;
+
+    @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Id
+    @MapsId("taskId")
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
 
     @Column(name = "completion_count", nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer completionCount;
+    private Integer completionCount = 0;
 }
+
