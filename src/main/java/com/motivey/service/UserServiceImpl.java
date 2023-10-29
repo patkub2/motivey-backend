@@ -3,8 +3,11 @@ package com.motivey.service;
 import com.motivey.dto.UserRegistrationDto;
 import com.motivey.exception.UserAlreadyExistsException;
 import com.motivey.model.Role;
+import com.motivey.model.Stat;
+import com.motivey.model.StatId;
 import com.motivey.model.User;
 import com.motivey.repository.RoleRepository;
+import com.motivey.repository.StatRepository;
 import com.motivey.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +19,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private StatRepository statRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -37,6 +42,20 @@ public class UserServiceImpl implements UserService {
         Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RuntimeException("User role not found"));
         user.setRole(userRole);
 
-        return userRepository.save(user);
+        user = userRepository.save(user); // Save the user to ensure it has an ID before creating stats
+
+        // Add default stats to the user
+        for (Stat.StatType type : Stat.StatType.values()) {
+            Stat stat = new Stat();
+            StatId statId = new StatId();
+            statId.setUserId(user.getId());
+            statId.setType(type.name());
+            stat.setId(statId);
+            stat.setUser(user);
+            statRepository.save(stat); // Assuming you have StatRepository injected and available
+        }
+
+        return user;
     }
+
 }
