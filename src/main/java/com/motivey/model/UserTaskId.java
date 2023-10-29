@@ -17,7 +17,6 @@ public class UserTaskId implements Serializable {
     @Column(name = "task_id")
     private Long taskId;
 
-    // Constructors, getters, setters, hashCode(), and equals() methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

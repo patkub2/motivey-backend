@@ -1,5 +1,6 @@
 package com.motivey.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,5 +29,19 @@ public class TokenProvider {
                 .compact();
     }
 
-    // Other utility methods for token, e.g., validateToken(), getAuthentication(), etc.
+
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+        return claims.getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            // Token is either expired or invalid
+            return false;
+        }
+    }
 }
