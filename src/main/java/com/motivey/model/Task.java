@@ -18,7 +18,7 @@ public class Task {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('habbits', 'challenges', 'goals')")
+    @Column(columnDefinition = "ENUM('HABITS', 'CHALLENGES', 'GOALS')")
     private Section section;
 
     @Column(name = "difficulty_level")
@@ -26,11 +26,11 @@ public class Task {
 
     private Integer experience;
 
-    @Column(name = "daily_execution_counter", nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer dailyExecutionCounter;
+    @Column(name = "daily_execution_counter", nullable = false)
+    private Integer dailyExecutionCounter = 0; // default value
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('int', 'str', 'agi', 'vit')")
+    @Column(columnDefinition = "ENUM('INT', 'STR', 'AGI', 'VIT')")
     private StatType type;
 
     private String icon;

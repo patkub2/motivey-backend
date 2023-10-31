@@ -35,7 +35,7 @@ public class TaskController {
     @Autowired
     private UserTaskRepository userTaskRepository;
 
-    @PostMapping("/task")
+    @PostMapping("/task/add")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -67,13 +67,16 @@ public class TaskController {
         return new ResponseEntity<>("User not authenticated", HttpStatus.UNAUTHORIZED);
     }
 
-    // Utility method to convert TaskDto to Task Entity
     private Task convertToTaskEntity(TaskDto taskDto) {
         Task task = new Task();
-        // map all properties from taskDto to task, e.g.
+
         task.setName(taskDto.getName());
         task.setSection(taskDto.getSection());
-        // ... map other properties
+        task.setDifficultyLevel(taskDto.getDifficultyLevel());
+        task.setExperience(taskDto.getExperience());
+        task.setType(taskDto.getType());
+        task.setIcon(taskDto.getIcon());
+
         return task;
     }
 }
