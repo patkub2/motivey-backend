@@ -17,10 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api")
@@ -35,6 +32,26 @@ public class TaskController {
     @Autowired
     private UserTaskRepository userTaskRepository;
 
+    @GetMapping("/task/{taskId}")
+    public ResponseEntity<?> getTask(@PathVariable Long taskId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+
+        UserTaskId userTaskId = new UserTaskId();
+        userTaskId.setUserId(user.getId());
+        userTaskId.setTaskId(taskId);
+
+        UserTask userTask = userTaskRepository.findById(userTaskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"));
+
+
+        return ResponseEntity.ok(task);
+    }
     @PostMapping("/task/add")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -66,6 +83,7 @@ public class TaskController {
 
         return new ResponseEntity<>("User not authenticated", HttpStatus.UNAUTHORIZED);
     }
+
 
     private Task convertToTaskEntity(TaskDto taskDto) {
         Task task = new Task();

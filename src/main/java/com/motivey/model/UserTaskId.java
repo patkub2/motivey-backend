@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
 @Setter
+@Embeddable
 public class UserTaskId implements Serializable {
 
     @Column(name = "user_id")
@@ -16,6 +18,7 @@ public class UserTaskId implements Serializable {
 
     @Column(name = "task_id")
     private Long taskId;
+
 
     @Override
     public boolean equals(Object o) {
