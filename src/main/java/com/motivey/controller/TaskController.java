@@ -19,6 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class TaskController {
@@ -51,6 +54,16 @@ public class TaskController {
 
 
         return ResponseEntity.ok(task);
+    }
+    @GetMapping("/tasks")
+    public ResponseEntity<?> listTasks() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+
+        // This can be a list of all tasks or filtered by the logged-in user
+        List<Task> tasks = taskRepository.findAll(); // or a custom method to find by user
+
+        return ResponseEntity.ok(tasks);
     }
     @PostMapping("/task/add")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto) {
