@@ -3,10 +3,7 @@ package com.motivey.controller;
 import com.motivey.dto.TaskDto;
 
 import com.motivey.exception.UsernameNotFoundException;
-import com.motivey.model.Task;
-import com.motivey.model.User;
-import com.motivey.model.UserTask;
-import com.motivey.model.UserTaskId;
+import com.motivey.model.*;
 import com.motivey.repository.TaskRepository;
 import com.motivey.repository.UserRepository;
 
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -95,6 +93,27 @@ public class TaskController {
         }
 
         return new ResponseEntity<>("User not authenticated", HttpStatus.UNAUTHORIZED);
+    }
+    @GetMapping("/tasks/section/{section}")
+    public ResponseEntity<List<Task>> getTasksBySection(@PathVariable String section) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Convert String to Enum
+        Section sectionEnum;
+        try {
+            sectionEnum = Section.valueOf(section.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid section value");
+        }
+
+        List<UserTask> userTasks = userTaskRepository.findByUserIdAndTask_Section(user.getId(), sectionEnum);
+        List<Task> tasks = userTasks.stream().map(UserTask::getTask).collect(Collectors.toList());
+
+        return ResponseEntity.ok(tasks);
     }
 
 
