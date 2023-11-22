@@ -29,6 +29,9 @@ public class Task {
     @Column(name = "daily_execution_counter", nullable = false)
     private Integer dailyExecutionCounter = 0; // default value
 
+    @Column(nullable = false)
+    private Boolean completed = false; // default value
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('INT', 'STR', 'AGI', 'VIT')")
     private StatType type;

@@ -116,6 +116,32 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @PatchMapping("/task/{taskId}/increment-counter")
+    public ResponseEntity<?> incrementTaskCounter(@PathVariable Long taskId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Retrieve the task and check if the user is authorized to increment it
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+
+        UserTaskId userTaskId = new UserTaskId();
+        userTaskId.setUserId(user.getId());
+        userTaskId.setTaskId(taskId);
+
+        UserTask userTask = userTaskRepository.findById(userTaskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"));
+
+        // Increment the daily execution counter
+        task.setDailyExecutionCounter(task.getDailyExecutionCounter() + 1);
+        taskRepository.save(task);
+
+        return ResponseEntity.ok(task);
+    }
+
+
 
     private Task convertToTaskEntity(TaskDto taskDto) {
         Task task = new Task();
