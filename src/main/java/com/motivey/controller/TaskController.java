@@ -4,6 +4,7 @@ import com.motivey.dto.TaskDto;
 
 import com.motivey.exception.UsernameNotFoundException;
 import com.motivey.model.*;
+import com.motivey.repository.StatRepository;
 import com.motivey.repository.TaskRepository;
 import com.motivey.repository.UserRepository;
 
@@ -29,6 +30,9 @@ public class TaskController {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private StatRepository statRepository;
 
     @Autowired
     private UserTaskRepository userTaskRepository;
@@ -136,11 +140,24 @@ public class TaskController {
 
         // Increment the daily execution counter
         task.setDailyExecutionCounter(task.getDailyExecutionCounter() + 1);
+
+        // Allocate experience to the user's overall level and specific stat
+        user.addExperience(task.getExperience() / 2); // Half experience to overall level
+        allocateStatExperience(user, task.getType(), task.getExperience()); // Full experience to specific stat
+
         taskRepository.save(task);
+        userRepository.save(user);
 
         return ResponseEntity.ok(task);
     }
+    private void allocateStatExperience(User user, StatType statType, int experience) {
+        // Find the specific stat for the user and task type
+        StatId statId = new StatId(user.getId(), statType.toString());
+        Stat stat = statRepository.findById(statId).orElse(new Stat(new StatId(user.getId(), statType.toString()), user, 1, 0, 4));
+        stat.addStatExperience(experience);
 
+        statRepository.save(stat);
+    }
 
 
     private Task convertToTaskEntity(TaskDto taskDto) {

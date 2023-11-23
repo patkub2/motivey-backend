@@ -1,6 +1,8 @@
 package com.motivey.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -9,6 +11,8 @@ import javax.persistence.*;
 @Table(name = "stats")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Stat {
 
     @EmbeddedId
@@ -30,4 +34,9 @@ public class Stat {
     private Integer maxExp = 4;
 
 
+
+    public void addStatExperience(int exp) {
+        this.currentExp += exp;
+        // Implement logic to handle stat level up if currentExp >= maxExp
+    }
 }

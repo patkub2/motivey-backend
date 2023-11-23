@@ -33,6 +33,12 @@ public class User {
     @Column(name = "character_level", nullable = false, columnDefinition = "INT DEFAULT 1")
     private Integer characterLevel = 1;
 
+    @Column(name = "max_exp", nullable = false, columnDefinition = "INT DEFAULT 100")
+    private Integer maxExp = 100;
+
+    @Column(name = "current_exp", nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer currentExp = 0;
+
     @Column(name = "max_hp", nullable = false, columnDefinition = "INT DEFAULT 100")
     private Integer maxHp = 100;
 
@@ -54,4 +60,9 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    public void addExperience(int exp) {
+        this.currentExp += exp;
+        // Implement logic to handle level up if currentExp >= maxExp
+    }
 }
