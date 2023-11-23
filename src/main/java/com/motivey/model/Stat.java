@@ -30,13 +30,21 @@ public class Stat {
     @Column(name = "current_exp", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer currentExp = 0;
 
-    @Column(name = "max_exp", nullable = false, columnDefinition = "INT DEFAULT 4")
-    private Integer maxExp = 4;
-
+    @Column(name = "max_exp", nullable = false, columnDefinition = "INT DEFAULT 100")
+    private Integer maxExp = 100;
 
 
     public void addStatExperience(int exp) {
         this.currentExp += exp;
-        // Implement logic to handle stat level up if currentExp >= maxExp
+
+        while (this.currentExp >= this.maxExp) {
+            // Level up
+            this.level++;
+            this.currentExp -= this.maxExp;
+
+        }
+
+        // Additional logic for other effects of leveling up can be added here
     }
+
 }
