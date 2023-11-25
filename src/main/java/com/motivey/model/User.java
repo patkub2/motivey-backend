@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +59,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stat> stats = new ArrayList<>();
 
+    @Column(name = "last_hp_update", nullable = true)
+    private LocalDateTime lastHpUpdate;
+
+    @Column(name = "last_mana_update", nullable = true)
+    private LocalDateTime lastManaUpdate;
+
+    @Transient // Assuming this is not persisted. Change as per your persistence strategy.
+    private List<StackingEffect> stackingEffects = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
@@ -76,6 +87,41 @@ public class User {
         }
 
         // Additional logic for other effects of leveling up can be added here
+    }
+
+    public void regenerateHpAndMana() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // Calculate total boost from non-expired stacking effects
+        int hpBoost = stackingEffects.stream()
+                .filter(e -> e.getEffectType() == StackingEffect.EffectType.HP_REGEN && !e.isExpired())
+                .mapToInt(StackingEffect::getBoostAmount)
+                .sum();
+        int manaBoost = stackingEffects.stream()
+                .filter(e -> e.getEffectType() == StackingEffect.EffectType.MANA_REGEN && !e.isExpired())
+                .mapToInt(StackingEffect::getBoostAmount)
+                .sum();
+
+        // Regeneration logic, including the boost
+        if (lastHpUpdate != null) {
+            long hoursElapsed = ChronoUnit.HOURS.between(lastHpUpdate, now);
+            this.currentHp = Math.toIntExact(Math.min(this.maxHp, this.currentHp + (5 + hpBoost) * hoursElapsed));
+        }
+        if (lastManaUpdate != null) {
+            long hoursElapsed = ChronoUnit.HOURS.between(lastManaUpdate, now);
+            this.currentMana = Math.toIntExact(Math.min(this.maxMana, this.currentMana + (5 + manaBoost) * hoursElapsed));
+        }
+
+        this.lastHpUpdate = now;
+        this.lastManaUpdate = now;
+
+        // Remove expired effects
+        stackingEffects.removeIf(StackingEffect::isExpired);
+    }
+
+    // Method to add stacking effect
+    public void addStackingEffect(StackingEffect effect) {
+        this.stackingEffects.add(effect);
     }
 
 }
