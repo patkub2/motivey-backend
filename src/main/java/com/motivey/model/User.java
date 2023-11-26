@@ -1,6 +1,8 @@
 package com.motivey.model;
 
 import javax.persistence.OneToMany;
+
+import com.motivey.enums.Ability;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -65,8 +67,10 @@ public class User {
     @Column(name = "last_mana_update", nullable = true)
     private LocalDateTime lastManaUpdate;
 
-    @Transient // Assuming this is not persisted. Change as per your persistence strategy.
-    private List<StackingEffect> stackingEffects = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "user_ability_effects", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "ability_effect")
+    private List<AbilityEffect> abilityEffects = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -88,40 +92,31 @@ public class User {
 
         // Additional logic for other effects of leveling up can be added here
     }
-
     public void regenerateHpAndMana() {
         LocalDateTime now = LocalDateTime.now();
+        int manaRegenRate = 5; // Base mana regeneration rate
 
-        // Calculate total boost from non-expired stacking effects
-        int hpBoost = stackingEffects.stream()
-                .filter(e -> e.getEffectType() == StackingEffect.EffectType.HP_REGEN && !e.isExpired())
-                .mapToInt(StackingEffect::getBoostAmount)
-                .sum();
-        int manaBoost = stackingEffects.stream()
-                .filter(e -> e.getEffectType() == StackingEffect.EffectType.MANA_REGEN && !e.isExpired())
-                .mapToInt(StackingEffect::getBoostAmount)
-                .sum();
 
-        // Regeneration logic, including the boost
+
+        // Check for ARCANE_INSIGHT ability and adjust mana regeneration rate
+        for (AbilityEffect effect : this.abilityEffects) {
+            if (effect.getAbilityType() == Ability.ARCANE_INSIGHT && effect.isActive(now)) {
+                manaRegenRate += effect.getEffectMagnitude(); // Adjust the rate based on the effect magnitude
+                break; // Assuming only one ARCANE_INSIGHT effect can be active at a time
+            }
+        }
+
+        // Apply regeneration logic
         if (lastHpUpdate != null) {
             long hoursElapsed = ChronoUnit.HOURS.between(lastHpUpdate, now);
-            this.currentHp = Math.toIntExact(Math.min(this.maxHp, this.currentHp + (5 + hpBoost) * hoursElapsed));
+            this.currentHp = Math.toIntExact(Math.min(this.maxHp, this.currentHp + 5 * hoursElapsed));
         }
         if (lastManaUpdate != null) {
             long hoursElapsed = ChronoUnit.HOURS.between(lastManaUpdate, now);
-            this.currentMana = Math.toIntExact(Math.min(this.maxMana, this.currentMana + (5 + manaBoost) * hoursElapsed));
+            this.currentMana = Math.toIntExact(Math.min(this.maxMana, this.currentMana + manaRegenRate * hoursElapsed));
         }
 
         this.lastHpUpdate = now;
         this.lastManaUpdate = now;
-
-        // Remove expired effects
-        stackingEffects.removeIf(StackingEffect::isExpired);
     }
-
-    // Method to add stacking effect
-    public void addStackingEffect(StackingEffect effect) {
-        this.stackingEffects.add(effect);
-    }
-
 }

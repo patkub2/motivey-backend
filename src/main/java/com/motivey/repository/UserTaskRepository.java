@@ -1,6 +1,6 @@
 package com.motivey.repository;
 
-import com.motivey.model.Section;
+import com.motivey.enums.Section;
 import com.motivey.model.UserTask;
 import com.motivey.model.UserTaskId;
 import org.springframework.data.jpa.repository.JpaRepository;

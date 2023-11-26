@@ -1,5 +1,7 @@
 package com.motivey.model;
 
+import com.motivey.enums.Section;
+import com.motivey.enums.StatType;
 import lombok.Getter;
 import lombok.Setter;
 

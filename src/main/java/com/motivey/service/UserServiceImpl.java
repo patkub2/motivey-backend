@@ -1,6 +1,7 @@
 package com.motivey.service;
 
 import com.motivey.dto.UserRegistrationDto;
+import com.motivey.enums.StatType;
 import com.motivey.exception.UserAlreadyExistsException;
 import com.motivey.model.*;
 import com.motivey.repository.RoleRepository;

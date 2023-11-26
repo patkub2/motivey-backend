@@ -1,4 +1,4 @@
-package com.motivey.model;
+package com.motivey.enums;
 
 public enum StatType {
     INT, STR, AGI, VIT

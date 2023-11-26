@@ -1,7 +1,7 @@
 package com.motivey.dto;
 
-import com.motivey.model.Section;
-import com.motivey.model.StatType;
+import com.motivey.enums.Section;
+import com.motivey.enums.StatType;
 
 import lombok.Getter;
 import lombok.Setter;

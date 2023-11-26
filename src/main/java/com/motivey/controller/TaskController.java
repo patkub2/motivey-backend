@@ -2,7 +2,8 @@ package com.motivey.controller;
 
 import com.motivey.dto.TaskDto;
 
-import com.motivey.exception.UsernameNotFoundException;
+import com.motivey.enums.Section;
+import com.motivey.enums.StatType;
 import com.motivey.model.*;
 import com.motivey.repository.StatRepository;
 import com.motivey.repository.TaskRepository;
