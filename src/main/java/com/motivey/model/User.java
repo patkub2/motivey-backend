@@ -94,23 +94,16 @@ public class User {
     }
     public void regenerateHpAndMana() {
         LocalDateTime now = LocalDateTime.now();
-        int manaRegenRate = 5; // Base mana regeneration rate
+        int manaRegenRate = calculateManaRegenerationRate(now);
+        int hpRegenRate = calculateHpRegenerationRate(now);
 
-
-
-        // Check for ARCANE_INSIGHT ability and adjust mana regeneration rate
-        for (AbilityEffect effect : this.abilityEffects) {
-            if (effect.getAbilityType() == Ability.ARCANE_INSIGHT && effect.isActive(now)) {
-                manaRegenRate += effect.getEffectMagnitude(); // Adjust the rate based on the effect magnitude
-                break; // Assuming only one ARCANE_INSIGHT effect can be active at a time
-            }
-        }
-
-        // Apply regeneration logic
+        // Apply HP regeneration
         if (lastHpUpdate != null) {
             long hoursElapsed = ChronoUnit.HOURS.between(lastHpUpdate, now);
-            this.currentHp = Math.toIntExact(Math.min(this.maxHp, this.currentHp + 5 * hoursElapsed));
+            this.currentHp = Math.toIntExact(Math.min(this.maxHp, this.currentHp + hpRegenRate * hoursElapsed));
         }
+
+        // Apply Mana regeneration
         if (lastManaUpdate != null) {
             long hoursElapsed = ChronoUnit.HOURS.between(lastManaUpdate, now);
             this.currentMana = Math.toIntExact(Math.min(this.maxMana, this.currentMana + manaRegenRate * hoursElapsed));
@@ -118,5 +111,25 @@ public class User {
 
         this.lastHpUpdate = now;
         this.lastManaUpdate = now;
+    }
+
+    private int calculateManaRegenerationRate(LocalDateTime now) {
+        int baseRate = 5;
+        for (AbilityEffect effect : this.abilityEffects) {
+            if (effect.getAbilityType() == Ability.ARCANE_INSIGHT && effect.isActive(now)) {
+                return baseRate + effect.getEffectMagnitude();
+            }
+        }
+        return baseRate;
+    }
+
+    private int calculateHpRegenerationRate(LocalDateTime now) {
+        int baseRate = 5;
+        for (AbilityEffect effect : this.abilityEffects) {
+            if (effect.getAbilityType() == Ability.IRON_RESOLVE && effect.isActive(now)) {
+                return baseRate + effect.getEffectMagnitude();
+            }
+        }
+        return baseRate;
     }
 }

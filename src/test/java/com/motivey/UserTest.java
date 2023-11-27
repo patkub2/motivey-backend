@@ -40,5 +40,21 @@ public class UserTest {
         assertEquals(65, user.getCurrentMana());
     }
 
+    @Test
+    public void testHpRegenerationWithIronResolveEffect() {
+        // Given: User with Iron Resolve effect active
+        AbilityEffect ironResolveEffect = new AbilityEffect(Ability.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now()); // Additional 10 HP per hour
+        user.setAbilityEffects(Collections.singletonList(ironResolveEffect));
+        user.setCurrentHp(50);
+        user.setMaxHp(100);
+        user.setLastHpUpdate(LocalDateTime.now().minusHours(1)); // Last updated an hour ago
+
+        // When: Regenerate HP is called
+        user.regenerateHpAndMana();
+
+        // Then: HP should increase by 15 (5 base regen + 10 from Iron Resolve)
+        assertEquals(65, user.getCurrentHp());
+    }
+
     // Other tests as needed for different abilities and scenarios
 }

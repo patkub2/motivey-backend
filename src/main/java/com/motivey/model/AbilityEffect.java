@@ -20,7 +20,7 @@ public class AbilityEffect {
     private Ability abilityType;
     private int magnitude;
     private Duration duration;
-    private LocalDateTime startTime; 
+    private LocalDateTime startTime;
 
     // Method to check if the ability effect is currently active
     public boolean isActive(LocalDateTime currentTime) {
