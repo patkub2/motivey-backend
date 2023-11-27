@@ -1,27 +1,34 @@
 package com.motivey;
 
-import com.motivey.model.User;
-import com.motivey.model.AbilityEffect;
 import com.motivey.enums.Ability;
+import com.motivey.enums.StatType;
+import com.motivey.model.*;
+import com.motivey.service.AbilitiesManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
+import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserTest {
 
-
     private User user;
+
+    @Mock
+    private AbilitiesManager abilitiesManager;
+
     @BeforeEach
     public void setup() {
-        // Initialize the user object before each test
+        abilitiesManager = new AbilitiesManager();
         user = new User();
-        // Other initializations if needed
+        // other initializations if needed
     }
     @Test
     public void testArcaneInsightEffect() {
@@ -33,26 +40,44 @@ public class UserTest {
         user.setLastManaUpdate(LocalDateTime.now().minusHours(1)); // Last updated an hour ago
 
         // Invoke the method
-        user.regenerateHpAndMana();
+        abilitiesManager.applyEffects(user);
 
         // Assertions
-        // Base regen is 5 mana per hour, plus 10 from ARCANE_INSIGHT, so expect 65 mana after an hour
         assertEquals(65, user.getCurrentMana());
     }
 
     @Test
-    public void testHpRegenerationWithIronResolveEffect() {
-        // Given: User with Iron Resolve effect active
-        AbilityEffect ironResolveEffect = new AbilityEffect(Ability.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now()); // Additional 10 HP per hour
-        user.setAbilityEffects(Collections.singletonList(ironResolveEffect));
+    public void testWisdomWaveEffect() {
+        // Setup
+        Stat intStat = new Stat(new StatId(user.getId(), "INT"), user, 1, 0, 1000);
+        user.getStats().add(intStat); // Ensure the user has an INT stat
+        Task task = new Task();
+        task.setType(StatType.INT);
+        task.setExperience(100); // Base experience
+        AbilityEffect wisdomWave = new AbilityEffect(Ability.WISDOM_WAVE, 50, Duration.ofHours(6), LocalDateTime.now());
+        user.setAbilityEffects(Collections.singletonList(wisdomWave));
+
+        // Act
+        abilitiesManager.completeTask(user, task);
+
+        // Assert
+        assertEquals(150, intStat.getCurrentExp()); // Full boosted experience to INT stat
+        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+    }
+    @Test
+    public void testIronResolveEffect() {
+        // Setup
+        AbilityEffect ironResolve = new AbilityEffect(Ability.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now()); // 10 additional HP per hour
+        user.setAbilityEffects(Collections.singletonList(ironResolve));
         user.setCurrentHp(50);
         user.setMaxHp(100);
         user.setLastHpUpdate(LocalDateTime.now().minusHours(1)); // Last updated an hour ago
 
-        // When: Regenerate HP is called
-        user.regenerateHpAndMana();
+        // Invoke the method
+        abilitiesManager.applyEffects(user);
 
-        // Then: HP should increase by 15 (5 base regen + 10 from Iron Resolve)
+        // Assertions
+        // Base regen is 5 HP per hour, plus 10 from IRON_RESOLVE, so expect 65 HP after an hour
         assertEquals(65, user.getCurrentHp());
     }
 

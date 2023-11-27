@@ -3,6 +3,7 @@ package com.motivey.model;
 import javax.persistence.OneToMany;
 
 import com.motivey.enums.Ability;
+import com.motivey.enums.StatType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -92,44 +93,5 @@ public class User {
 
         // Additional logic for other effects of leveling up can be added here
     }
-    public void regenerateHpAndMana() {
-        LocalDateTime now = LocalDateTime.now();
-        int manaRegenRate = calculateManaRegenerationRate(now);
-        int hpRegenRate = calculateHpRegenerationRate(now);
 
-        // Apply HP regeneration
-        if (lastHpUpdate != null) {
-            long hoursElapsed = ChronoUnit.HOURS.between(lastHpUpdate, now);
-            this.currentHp = Math.toIntExact(Math.min(this.maxHp, this.currentHp + hpRegenRate * hoursElapsed));
-        }
-
-        // Apply Mana regeneration
-        if (lastManaUpdate != null) {
-            long hoursElapsed = ChronoUnit.HOURS.between(lastManaUpdate, now);
-            this.currentMana = Math.toIntExact(Math.min(this.maxMana, this.currentMana + manaRegenRate * hoursElapsed));
-        }
-
-        this.lastHpUpdate = now;
-        this.lastManaUpdate = now;
-    }
-
-    private int calculateManaRegenerationRate(LocalDateTime now) {
-        int baseRate = 5;
-        for (AbilityEffect effect : this.abilityEffects) {
-            if (effect.getAbilityType() == Ability.ARCANE_INSIGHT && effect.isActive(now)) {
-                return baseRate + effect.getEffectMagnitude();
-            }
-        }
-        return baseRate;
-    }
-
-    private int calculateHpRegenerationRate(LocalDateTime now) {
-        int baseRate = 5;
-        for (AbilityEffect effect : this.abilityEffects) {
-            if (effect.getAbilityType() == Ability.IRON_RESOLVE && effect.isActive(now)) {
-                return baseRate + effect.getEffectMagnitude();
-            }
-        }
-        return baseRate;
-    }
 }

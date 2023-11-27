@@ -15,9 +15,9 @@ public enum Ability {
     INTELLECT_ECHO,      // Occasionally doubles experience from mental challenges
     CEREBRAL_MASTERY,     // Reduces cooldown on INT-linked abilities
 
-    /////////////
+    ///////////// STR
     MIGHTY_ROAR,         // Strengthens physical tasks' effectiveness
-    IRON_RESOLVE,        // Enhances HP regeneration after STR-based activities
+    IRON_RESOLVE,        // Enhances HP regeneration
     BRUTE_FORCE,         // Temporarily boosts STR stats during challenges
     TITAN_S_GRIP,        // Increases gold gain from strength tasks
     POWER_SURGE,          // Reduces effort needed for STR-related tasks
