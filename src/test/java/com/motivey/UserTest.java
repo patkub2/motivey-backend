@@ -45,7 +45,22 @@ public class UserTest {
         // Assertions
         assertEquals(65, user.getCurrentMana());
     }
+    @Test
+    public void testIronResolveEffect() {
+        // Setup
+        AbilityEffect ironResolve = new AbilityEffect(Ability.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now()); // 10 additional HP per hour
+        user.setAbilityEffects(Collections.singletonList(ironResolve));
+        user.setCurrentHp(50);
+        user.setMaxHp(100);
+        user.setLastHpUpdate(LocalDateTime.now().minusHours(1)); // Last updated an hour ago
 
+        // Invoke the method
+        abilitiesManager.applyEffects(user);
+
+        // Assertions
+        // Base regen is 5 HP per hour, plus 10 from IRON_RESOLVE, so expect 65 HP after an hour
+        assertEquals(65, user.getCurrentHp());
+    }
     @Test
     public void testWisdomWaveEffect() {
         // Setup
@@ -64,22 +79,24 @@ public class UserTest {
         assertEquals(150, intStat.getCurrentExp()); // Full boosted experience to INT stat
         assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
     }
+
     @Test
-    public void testIronResolveEffect() {
+    public void testNimbleMindEffect() {
         // Setup
-        AbilityEffect ironResolve = new AbilityEffect(Ability.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now()); // 10 additional HP per hour
-        user.setAbilityEffects(Collections.singletonList(ironResolve));
-        user.setCurrentHp(50);
-        user.setMaxHp(100);
-        user.setLastHpUpdate(LocalDateTime.now().minusHours(1)); // Last updated an hour ago
+        Stat agiStat = new Stat(new StatId(user.getId(), "AGI"), user, 1, 0, 1000);
+        user.getStats().add(agiStat); // Ensure the user has an AGI stat
+        Task task = new Task();
+        task.setType(StatType.AGI);
+        task.setExperience(100); // Base experience
+        AbilityEffect NimbleMind = new AbilityEffect(Ability.NIMBLE_MIND, 50, Duration.ofHours(6), LocalDateTime.now());
+        user.setAbilityEffects(Collections.singletonList(NimbleMind));
 
-        // Invoke the method
-        abilitiesManager.applyEffects(user);
+        // Act
+        abilitiesManager.completeTask(user, task);
 
-        // Assertions
-        // Base regen is 5 HP per hour, plus 10 from IRON_RESOLVE, so expect 65 HP after an hour
-        assertEquals(65, user.getCurrentHp());
+        // Assert
+        assertEquals(150, agiStat.getCurrentExp()); // Full boosted experience to INT stat
+        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
     }
-
     // Other tests as needed for different abilities and scenarios
 }

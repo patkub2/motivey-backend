@@ -65,19 +65,27 @@ public class AbilitiesManager {
     public void completeTask(User user, Task task) {
         int experienceGain = task.getExperience();
 
-        // Apply WISDOM_WAVE effect if applicable
+        // Apply WISDOM_WAVE effect if the task type is INT
         if (task.getType() == StatType.INT) {
-            for (AbilityEffect effect : user.getAbilityEffects()) {
-                if (effect.getAbilityType() == Ability.WISDOM_WAVE && effect.isActive(LocalDateTime.now())) {
-                    experienceGain += experienceGain * effect.getEffectMagnitude() / 100;
-                    break; // Assuming only one effect of the same type is active at a time
-                }
-            }
+            experienceGain = applyAbilityEffect(user, task, experienceGain, Ability.WISDOM_WAVE);
+        }
+        // Apply NIMBLE_MIND effect if the task type is AGI
+        else if (task.getType() == StatType.AGI) {
+            experienceGain = applyAbilityEffect(user, task, experienceGain, Ability.NIMBLE_MIND);
         }
 
         // Add experience to overall level and specific stat
         user.addExperience(experienceGain / 2); // Half of the experience to the overall level
         allocateStatExperience(user, task.getType(), experienceGain); // Full experience to the specific stat
+    }
+
+    private int applyAbilityEffect(User user, Task task, int baseExperience, Ability ability) {
+        for (AbilityEffect effect : user.getAbilityEffects()) {
+            if (effect.getAbilityType() == ability && effect.isActive(LocalDateTime.now())) {
+                return baseExperience + baseExperience * effect.getEffectMagnitude() / 100;
+            }
+        }
+        return baseExperience;
     }
 
     private void allocateStatExperience(User user, StatType statType, int experience) {
@@ -88,6 +96,7 @@ public class AbilitiesManager {
             }
         }
     }
+
 
     // Other methods as before
 }

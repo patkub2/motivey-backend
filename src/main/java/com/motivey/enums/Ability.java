@@ -11,7 +11,7 @@ public enum Ability {
     ///////////// INT
     MIND_SURGE,          // Boosts experience gain from intellectual tasks
     ARCANE_INSIGHT,      // Enhances mana regeneration
-    WISDOM_WAVE,         // Increases effectiveness of INT-based tasks
+    WISDOM_WAVE,         // Increases effectiveness of INT-based tasks (exp base)
     INTELLECT_ECHO,      // Occasionally doubles experience from mental challenges
     CEREBRAL_MASTERY,     // Reduces cooldown on INT-linked abilities
 
