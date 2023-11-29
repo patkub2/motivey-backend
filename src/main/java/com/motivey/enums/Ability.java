@@ -9,7 +9,7 @@ public enum Ability {
     EVASION_MASTERY ,     // Adds a chance to avoid negative effects in AGI tasks
 
     ///////////// INT
-    MIND_SURGE,          // Boosts experience gain from intellectual tasks
+    MIND_SURGE,          //-- gain MP
     ARCANE_INSIGHT,      //-- Enhances mana regeneration
     WISDOM_WAVE,         //-- Increases effectiveness of INT-based tasks (exp base)
     INTELLECT_ECHO,      // Occasionally doubles experience from mental challenges
@@ -17,13 +17,13 @@ public enum Ability {
 
     ///////////// STR
     MIGHTY_ROAR,         // Strengthens physical tasks' effectiveness
-    IRON_RESOLVE,        // Enhances HP regeneration
+    IRON_RESOLVE,        // -- Enhances HP regeneration
     BRUTE_FORCE,         // Temporarily boosts STR stats during challenges
-    TITAN_S_GRIP,
+    TITAN_S_GRIP,          //-- Increases effectiveness of STR-based tasks (exp base)
     POWER_SURGE,          // Reduces effort needed for STR-related tasks
 
     ///////////// VIT
-    STEADFAST,           //-- Increases HP cap temporarily
+    STEADFAST,           //-- Gain HP
     ENDURING_SOUL,       // Enhances HP regeneration rate
     RESILIENT_SPIRIT,    // Reduces damage taken during VIT challenges
     LIFE_S_BOUNTY,       //-- Increases effectiveness of VIT-based tasks (exp base)

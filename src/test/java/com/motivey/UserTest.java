@@ -154,5 +154,24 @@ public class UserTest {
         assertEquals(100, user.getCurrentHp(), "User's HP should not exceed maximum HP");
     }
 
+
+    @Test
+    public void testMindSurgeAbility() {
+        // Given: A user with less than maximum Mana
+        user.setCurrentMana(70);
+        user.setMaxMana(100);
+
+        // When: Mind Surge ability is applied
+        abilitiesManager.applyMindSurgeAbility(user);
+
+        // Then: User's Mana should increase by 50 but not exceed max Mana
+        assertEquals(100, user.getCurrentMana(), "Mana should be restored up to the max Mana");
+
+        // Test case where Mana is close to max
+        user.setCurrentMana(95); // Only 5 Mana below max
+        abilitiesManager.applyMindSurgeAbility(user);
+        assertEquals(100, user.getCurrentMana(), "Mana should be restored up to the max Mana, not beyond");
+    }
+
     // Other tests as needed for different abilities and scenarios
 }

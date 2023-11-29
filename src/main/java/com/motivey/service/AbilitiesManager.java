@@ -67,6 +67,11 @@ public class AbilitiesManager {
         user.setCurrentHp(Math.min(user.getCurrentHp() + healingAmount, user.getMaxHp()));
     }
 
+    public void applyMindSurgeAbility(User user) {
+        int manaRestoreAmount = 50; // Amount to restore mana
+        int newMana = Math.min(user.getCurrentMana() + manaRestoreAmount, user.getMaxMana());
+        user.setCurrentMana(newMana);
+    }
     public void completeTask(User user, Task task) {
         int experienceGain = task.getExperience();
 
