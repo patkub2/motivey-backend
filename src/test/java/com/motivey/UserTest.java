@@ -98,5 +98,23 @@ public class UserTest {
         assertEquals(150, agiStat.getCurrentExp()); // Full boosted experience to INT stat
         assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
     }
+
+    @Test
+    public void testSteadfastAbility() {
+        user.setMaxHp(100);
+        // Given: User with 40 HP
+        user.setCurrentHp(40);
+
+        // When: Steadfast ability is applied
+        abilitiesManager.applySteadfastAbility(user);
+
+        // Then: User's HP should increase by 50, but not exceed max HP
+        assertEquals(90, user.getCurrentHp(), "User's HP should be healed by 50 points");
+
+        // Additional test to ensure HP doesn't exceed max HP
+        user.setCurrentHp(95);
+        abilitiesManager.applySteadfastAbility(user);
+        assertEquals(100, user.getCurrentHp(), "User's HP should not exceed maximum HP");
+    }
     // Other tests as needed for different abilities and scenarios
 }

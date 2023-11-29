@@ -62,6 +62,11 @@ public class AbilitiesManager {
         return baseRate;
     }
 
+    public void applySteadfastAbility(User user) {
+        final int healingAmount = 50; // Amount of HP to heal
+        user.setCurrentHp(Math.min(user.getCurrentHp() + healingAmount, user.getMaxHp()));
+    }
+
     public void completeTask(User user, Task task) {
         int experienceGain = task.getExperience();
 
@@ -72,6 +77,14 @@ public class AbilitiesManager {
         // Apply NIMBLE_MIND effect if the task type is AGI
         else if (task.getType() == StatType.AGI) {
             experienceGain = applyAbilityEffect(user, task, experienceGain, Ability.NIMBLE_MIND);
+        }
+        // Apply NIMBLE_MIND effect if the task type is AGI
+        else if (task.getType() == StatType.STR) {
+            experienceGain = applyAbilityEffect(user, task, experienceGain, Ability.TITAN_S_GRIP);
+        }
+        // Apply NIMBLE_MIND effect if the task type is AGI
+        else if (task.getType() == StatType.VIT) {
+            experienceGain = applyAbilityEffect(user, task, experienceGain, Ability.LIFE_S_BOUNTY);
         }
 
         // Add experience to overall level and specific stat
