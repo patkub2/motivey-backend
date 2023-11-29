@@ -100,6 +100,43 @@ public class UserTest {
     }
 
     @Test
+    public void testTitanSGripEffect() {
+        // Setup TITAN_S_GRIP
+        Stat strStat = new Stat(new StatId(user.getId(), "STR"), user, 1, 0, 1000);
+        user.getStats().add(strStat); // Ensure the user has an STR stat
+        Task task = new Task();
+        task.setType(StatType.STR);
+        task.setExperience(100); // Base experience
+        AbilityEffect TitansGrip = new AbilityEffect(Ability.TITAN_S_GRIP, 50, Duration.ofHours(6), LocalDateTime.now());
+        user.setAbilityEffects(Collections.singletonList(TitansGrip));
+
+        // Act
+        abilitiesManager.completeTask(user, task);
+
+        // Assert
+        assertEquals(150, strStat.getCurrentExp()); // Full boosted experience to INT stat
+        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+    }
+
+    @Test
+    public void testLifeSBountyEffect() {
+        // Setup LIFE_S_BOUNTY
+        Stat vitStat = new Stat(new StatId(user.getId(), "VIT"), user, 1, 0, 1000);
+        user.getStats().add(vitStat); // Ensure the user has an STR stat
+        Task task = new Task();
+        task.setType(StatType.VIT);
+        task.setExperience(100); // Base experience
+        AbilityEffect LifeSBounty = new AbilityEffect(Ability.LIFE_S_BOUNTY, 50, Duration.ofHours(6), LocalDateTime.now());
+        user.setAbilityEffects(Collections.singletonList(LifeSBounty));
+
+        // Act
+        abilitiesManager.completeTask(user, task);
+
+        // Assert
+        assertEquals(150, vitStat.getCurrentExp()); // Full boosted experience to INT stat
+        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+    }
+    @Test
     public void testSteadfastAbility() {
         user.setMaxHp(100);
         // Given: User with 40 HP
@@ -116,5 +153,6 @@ public class UserTest {
         abilitiesManager.applySteadfastAbility(user);
         assertEquals(100, user.getCurrentHp(), "User's HP should not exceed maximum HP");
     }
+
     // Other tests as needed for different abilities and scenarios
 }

@@ -26,6 +26,6 @@ public enum Ability {
     STEADFAST,           //-- Increases HP cap temporarily
     ENDURING_SOUL,       // Enhances HP regeneration rate
     RESILIENT_SPIRIT,    // Reduces damage taken during VIT challenges
-    LIFE_S_BOUNTY,       // Increases rewards from vitality tasks
+    LIFE_S_BOUNTY,       //-- Increases effectiveness of VIT-based tasks (exp base)
     GUARDIAN_AURA        // Provides a temporary shield in VIT-linked activities
 }
