@@ -2,7 +2,7 @@ package com.motivey.model;
 
 import javax.persistence.Embeddable;
 
-import com.motivey.enums.Ability;
+import com.motivey.enums.AbilityType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AbilityEffect {
-    private Ability abilityType;
+    private AbilityType abilityType;
     private int magnitude;
     private Duration duration;
     private LocalDateTime startTime;

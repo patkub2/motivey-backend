@@ -2,8 +2,6 @@ package com.motivey.model;
 
 import javax.persistence.OneToMany;
 
-import com.motivey.enums.Ability;
-import com.motivey.enums.StatType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +9,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 

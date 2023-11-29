@@ -1,6 +1,6 @@
 package com.motivey.enums;
 
-public enum Ability {
+public enum AbilityType {
     ////////////// AGI
     SWIFT_STEPS,         // Increases speed of completing AGI-linked tasks
     NIMBLE_MIND,         //-- Increases effectiveness of AGI-based tasks (exp base)
