@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.motivey.model.User.BASE_EXP;
+import static com.motivey.model.User.GROWTH_RATE;
+
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -22,6 +26,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ArmorService armorService;
     @Autowired
     private RoleRepository roleRepository;
 
@@ -54,6 +60,25 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+    @Override
+    public void addExperience(User user, int exp) {
+        user.setCurrentExp(user.getCurrentExp() + exp);
+
+        while (user.getCurrentExp() >= user.getMaxExp()) {
+            // Level up
+            user.setCharacterLevel(user.getCharacterLevel() + 1);
+            user.setCurrentExp(user.getCurrentExp() - user.getMaxExp());
+
+            // Update maxExp for the next level
+            // Assuming BASE_EXP and GROWTH_RATE are constants defined somewhere
+            user.setMaxExp((int)(BASE_EXP * Math.pow(GROWTH_RATE, user.getCharacterLevel() - 1)));
+
+            // Additional logic for other effects of leveling up can be added here
+        }
+
+        // Save the updated user
+        userRepository.save(user);
     }
 
 }

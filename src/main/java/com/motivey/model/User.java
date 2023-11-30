@@ -74,21 +74,11 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    private static final int BASE_EXP = 100;
-    private static final double GROWTH_RATE = 1.2; // Adjust this rate as needed
-    public void addExperience(int exp) {
-        this.currentExp += exp;
+    @ManyToOne
+    private ArmorTier currentArmor;
 
-        while (this.currentExp >= this.maxExp) {
-            // Level up
-            this.characterLevel++;
-            this.currentExp -= this.maxExp;
+    public static final int BASE_EXP = 100;
+    public static final double GROWTH_RATE = 1.2; // Adjust this rate as needed
 
-            // Update maxExp for the next level
-            this.maxExp = (int)(BASE_EXP * Math.pow(GROWTH_RATE, this.characterLevel - 1));
-        }
-
-        // Additional logic for other effects of leveling up can be added here
-    }
 
 }

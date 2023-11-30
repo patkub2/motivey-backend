@@ -7,6 +7,7 @@ import com.motivey.model.Stat;
 import com.motivey.model.Task;
 import com.motivey.model.User;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,9 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 public class AbilitiesManager {
+
+    @Autowired
+    private UserService userService;
 
     // Method to apply the effects of abilities
     public void applyEffects(User user) {
@@ -100,7 +104,7 @@ public class AbilitiesManager {
         }
 
         // Add experience to overall level and specific stat
-        user.addExperience(experienceGain / 2); // Half of the experience to the overall level
+        userService.addExperience(user,experienceGain / 2); // Half of the experience to the overall level
         allocateStatExperience(user, task.getType(), experienceGain); // Full experience to the specific stat
     }
 

@@ -10,6 +10,7 @@ import com.motivey.repository.TaskRepository;
 import com.motivey.repository.UserRepository;
 
 import com.motivey.repository.UserTaskRepository;
+import com.motivey.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,8 @@ public class TaskController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
     @Autowired
     private TaskRepository taskRepository;
 
@@ -143,7 +146,7 @@ public class TaskController {
         task.setDailyExecutionCounter(task.getDailyExecutionCounter() + 1);
 
         // Allocate experience to the user's overall level and specific stat
-        user.addExperience(task.getExperience() / 2); // Half experience to overall level
+        userService.addExperience(user,task.getExperience() / 2); // Half experience to overall level
         allocateStatExperience(user, task.getType(), task.getExperience()); // Full experience to specific stat
 
         taskRepository.save(task);
