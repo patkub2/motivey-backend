@@ -14,14 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.attribute.UserPrincipal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -42,8 +41,7 @@ public class AbilityController {
     private UserTaskRepository userTaskRepository;
 
     @PostMapping("/activate-ability")
-    public ResponseEntity<?> activateAbility(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                             @RequestBody AbilityActivationRequest request) {
+    public ResponseEntity<?> activateAbility(@RequestBody AbilityActivationRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
         User user = userRepository.findByEmail(loggedInUserEmail)
@@ -55,7 +53,34 @@ public class AbilityController {
                 LocalDateTime.now());
 
         abilitiesManager.activateAbility(user, effect);
+        userRepository.save(user); // Save the updated user
 
         return ResponseEntity.ok("Ability activated successfully");
+    }
+
+    @PostMapping("/apply-regeneration")
+    public ResponseEntity<?> applyRegenerationEffect() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        abilitiesManager.applyEffects(user);
+        return ResponseEntity.ok("Regeneration effect applied successfully");
+    }
+
+    @GetMapping("/user-abilities")
+    public ResponseEntity<?> getUserAbilities() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+        List<AbilityEffect> activeAbilities = user.getAbilityEffects().stream()
+                .filter(effect -> effect.isActive(now))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(activeAbilities);
     }
 }
