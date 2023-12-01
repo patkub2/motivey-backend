@@ -65,16 +65,22 @@ public class UserServiceImpl implements UserService {
     public void addExperience(User user, int exp) {
         user.setCurrentExp(user.getCurrentExp() + exp);
 
+        boolean levelUpOccurred = false;
         while (user.getCurrentExp() >= user.getMaxExp()) {
             // Level up
             user.setCharacterLevel(user.getCharacterLevel() + 1);
             user.setCurrentExp(user.getCurrentExp() - user.getMaxExp());
+            levelUpOccurred = true;
 
             // Update maxExp for the next level
-            // Assuming BASE_EXP and GROWTH_RATE are constants defined somewhere
             user.setMaxExp((int)(BASE_EXP * Math.pow(GROWTH_RATE, user.getCharacterLevel() - 1)));
 
             // Additional logic for other effects of leveling up can be added here
+        }
+
+        if (levelUpOccurred) {
+            // Update armor tier if the user leveled up
+            armorService.updateArmorTier(user);
         }
 
         // Save the updated user
