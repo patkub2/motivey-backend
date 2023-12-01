@@ -8,7 +8,9 @@ import com.motivey.model.Task;
 import com.motivey.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -25,11 +27,19 @@ public class AbilitiesManager {
         // Other effect application methods can be added here
     }
 
-    public void activateAbility(User user, AbilityEffect effect) {
-        // Add logic to activate the ability
-        user.getAbilityEffects().add(effect);
-        // Save user or perform necessary updates
+    public void activateAbility(User user, AbilityEffect newEffect) {
+        // Check if the user already has an active ability of the same type
+        boolean hasActiveSameTypeAbility = user.getAbilityEffects().stream()
+                .anyMatch(effect -> effect.getAbilityType() == newEffect.getAbilityType() && effect.isActive(LocalDateTime.now()));
+
+        if (hasActiveSameTypeAbility) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ability of this type is already active.");
+        }
+
+        // Add the new ability effect
+        user.getAbilityEffects().add(newEffect);
     }
+
 
 
     private void applyRegenerationEffects(User user) {

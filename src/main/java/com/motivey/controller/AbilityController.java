@@ -42,20 +42,25 @@ public class AbilityController {
 
     @PostMapping("/activate-ability")
     public ResponseEntity<?> activateAbility(@RequestBody AbilityActivationRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedInUserEmail = authentication.getName();
-        User user = userRepository.findByEmail(loggedInUserEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String loggedInUserEmail = authentication.getName();
+            User user = userRepository.findByEmail(loggedInUserEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        AbilityEffect effect = new AbilityEffect(request.getAbilityType(),
-                request.getEffectMagnitude(),
-                request.getDuration(),
-                LocalDateTime.now());
+            AbilityEffect effect = new AbilityEffect(request.getAbilityType(),
+                    request.getEffectMagnitude(),
+                    request.getDuration(),
+                    LocalDateTime.now());
 
-        abilitiesManager.activateAbility(user, effect);
-        userRepository.save(user); // Save the updated user
+            abilitiesManager.activateAbility(user, effect);
+            userRepository.save(user); // Save the updated user
 
-        return ResponseEntity.ok("Ability activated successfully");
+            return ResponseEntity.ok("Ability activated successfully");
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatus()).body(ex.getReason());
+        }
+
     }
 
     @PostMapping("/apply-regeneration")
