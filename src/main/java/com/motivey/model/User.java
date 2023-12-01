@@ -78,7 +78,7 @@ public class User {
     private ArmorTier currentArmor;
 
     public static final int BASE_EXP = 100;
-    public static final double GROWTH_RATE = 1.2; // Adjust this rate as needed
+    public static final double GROWTH_RATE = 1.027; // Adjust this rate as needed
 
 
 }

@@ -114,7 +114,7 @@ public class AbilitiesManager {
         }
 
         // Add experience to overall level and specific stat
-        userService.addExperience(user,experienceGain / 2); // Half of the experience to the overall level
+        userService.addExperience(user,experienceGain ); // Half of the experience to the overall level
         allocateStatExperience(user, task.getType(), experienceGain); // Full experience to the specific stat
     }
 
