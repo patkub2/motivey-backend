@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.attribute.UserPrincipal;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,10 +51,14 @@ public class AbilityController {
             User user = userRepository.findByEmail(loggedInUserEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-            AbilityEffect effect = new AbilityEffect(request.getAbilityType(),
+            AbilityEffect effect = new AbilityEffect(
+                    request.getAbilityType(),
                     request.getEffectMagnitude(),
                     request.getDuration(),
-                    LocalDateTime.now());
+                    LocalDateTime.now(),
+                    request.getCooldown(),
+                    request.getManaCost()
+            );
 
             abilitiesManager.activateAbility(user, effect);
             userRepository.save(user); // Save the updated user
@@ -61,6 +68,40 @@ public class AbilityController {
             return ResponseEntity.status(ex.getStatus()).body(ex.getReason());
         }
 
+    }
+
+    @GetMapping("/ability-cooldowns")
+    public ResponseEntity<?> getAbilityCooldowns() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+        List<Map<String, Object>> cooldowns = user.getAbilityEffects().stream()
+                .filter(effect -> !effect.isOffCooldown(now))
+                .map(effect -> {
+                    Map<String, Object> cooldownInfo = new HashMap<>();
+                    cooldownInfo.put("abilityType", effect.getAbilityType());
+                    cooldownInfo.put("remainingCooldown", Duration.between(now, effect.getStartTime().plus(effect.getCooldown())).toSeconds());
+                    return cooldownInfo;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(cooldowns);
+    }
+
+    @DeleteMapping("/delete-user-abilities")
+    public ResponseEntity<?> deleteUserAbilities() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.getAbilityEffects().clear(); // Clear all ability effects
+        userRepository.save(user); // Save the updated user
+
+        return ResponseEntity.ok("All abilities deleted successfully");
     }
 
     @PostMapping("/apply-regeneration")

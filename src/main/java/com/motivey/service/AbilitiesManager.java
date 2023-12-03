@@ -1,5 +1,6 @@
 package com.motivey.service;
 
+import com.motivey.dto.AbilityCooldownDto;
 import com.motivey.enums.AbilityType;
 import com.motivey.enums.StatType;
 import com.motivey.model.AbilityEffect;
@@ -12,8 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AbilitiesManager {
@@ -27,18 +31,49 @@ public class AbilitiesManager {
         // Other effect application methods can be added here
     }
 
-    public void activateAbility(User user, AbilityEffect newEffect) {
-        // Check if the user already has an active ability of the same type
-        boolean hasActiveSameTypeAbility = user.getAbilityEffects().stream()
-                .anyMatch(effect -> effect.getAbilityType() == newEffect.getAbilityType() && effect.isActive(LocalDateTime.now()));
 
-        if (hasActiveSameTypeAbility) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ability of this type is already active.");
+    public boolean activateAbility(User user, AbilityEffect newEffect) {
+        LocalDateTime now = LocalDateTime.now();
+
+        // Check if the user already has an ability of the same type
+        AbilityEffect existingEffect = user.getAbilityEffects().stream()
+                .filter(effect -> effect.getAbilityType() == newEffect.getAbilityType())
+                .findFirst()
+                .orElse(null);
+
+        // Check if the existing ability is on cooldown
+        if (existingEffect != null && !existingEffect.isOffCooldown(now)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ability is on cooldown.");
         }
 
-        // Add the new ability effect
-        user.getAbilityEffects().add(newEffect);
+        if (user.getCurrentMana() < newEffect.getManaCost()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient mana.");
+        }
+
+        // Deduct mana cost
+        user.setCurrentMana(user.getCurrentMana() - newEffect.getManaCost());
+
+        // If the ability already exists, update it, otherwise add a new one
+        if (existingEffect != null) {
+            existingEffect.setStartTime(now);
+            existingEffect.setMagnitude(newEffect.getMagnitude());
+            existingEffect.setDuration(newEffect.getDuration());
+            existingEffect.setCooldown(newEffect.getCooldown());
+            existingEffect.setManaCost(newEffect.getManaCost());
+        } else {
+            // Update ability start time for cooldown calculation
+            newEffect.setStartTime(now);
+            // Add the new ability effect
+            user.getAbilityEffects().add(newEffect);
+        }
+
+        // Save user state (if necessary)
+        // userRepository.save(user);
+
+        return true; // Ability activated or updated successfully
     }
+
+
 
 
 
@@ -114,8 +149,8 @@ public class AbilitiesManager {
         }
 
         // Add experience to overall level and specific stat
-        userService.addExperience(user,experienceGain ); // Half of the experience to the overall level
-        allocateStatExperience(user, task.getType(), experienceGain); // Full experience to the specific stat
+        userService.addExperience(user, experienceGain );
+        allocateStatExperience(user, task.getType(), experienceGain);
     }
 
     private int applyAbilityEffect(User user, Task task, int baseExperience, AbilityType abilityType) {

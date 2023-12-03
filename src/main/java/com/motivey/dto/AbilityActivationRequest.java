@@ -12,5 +12,7 @@ public class AbilityActivationRequest {
     private AbilityType abilityType;
     private int effectMagnitude; // Optional, based on ability
     private Duration duration;
+    private Duration cooldown;
+    private int manaCost;
 
 }
