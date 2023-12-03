@@ -4,33 +4,58 @@ import com.motivey.enums.AbilityType;
 import com.motivey.enums.StatType;
 import com.motivey.model.*;
 import com.motivey.service.AbilitiesManager;
+import com.motivey.service.UserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
 
 public class UserTest {
 
-    private User user;
+    @InjectMocks
+    private AbilitiesManager abilitiesManager;
 
     @Mock
-    private AbilitiesManager abilitiesManager;
+    private UserService userService;
+
+    private User user;
 
     @BeforeEach
     public void setup() {
-        abilitiesManager = new AbilitiesManager();
+        MockitoAnnotations.openMocks(this);
         user = new User();
-        // other initializations if needed
+        setupMocks();
     }
+
+    private void setupMocks() {
+        Mockito.reset(userService);
+        doAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            int exp = invocation.getArgument(1);
+            user.setCurrentExp(user.getCurrentExp() + exp);
+            return null;
+        }).when(userService).addExperience(any(User.class), anyInt());
+    }
+
     @Test
     public void testArcaneInsightEffect() {
         // Setup
-        AbilityEffect arcaneInsight = new AbilityEffect(AbilityType.ARCANE_INSIGHT, 10, Duration.ofHours(6), LocalDateTime.now()); // 10 additional mana per hour
+        AbilityEffect arcaneInsight = new AbilityEffect(AbilityType.ARCANE_INSIGHT, 10, Duration.ofHours(6), LocalDateTime.now(),
+                Duration.ofHours(24), // Cooldown, assuming 24 hours for simplicity
+                0  // Mana cost for the test, assuming 0 for simplicity
+        ); // 10 additional mana per hour
         user.setAbilityEffects(Collections.singletonList(arcaneInsight));
         user.setCurrentMana(50);
         user.setMaxMana(100);
@@ -45,7 +70,10 @@ public class UserTest {
     @Test
     public void testIronResolveEffect() {
         // Setup
-        AbilityEffect ironResolve = new AbilityEffect(AbilityType.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now()); // 10 additional HP per hour
+        AbilityEffect ironResolve = new AbilityEffect(AbilityType.IRON_RESOLVE, 10, Duration.ofHours(6), LocalDateTime.now(),
+                Duration.ofHours(24), // Cooldown, assuming 24 hours for simplicity
+                0  // Mana cost for the test, assuming 0 for simplicity
+        ); // 10 additional HP per hour
         user.setAbilityEffects(Collections.singletonList(ironResolve));
         user.setCurrentHp(50);
         user.setMaxHp(100);
@@ -66,7 +94,10 @@ public class UserTest {
         Task task = new Task();
         task.setType(StatType.INT);
         task.setExperience(100); // Base experience
-        AbilityEffect wisdomWave = new AbilityEffect(AbilityType.WISDOM_WAVE, 50, Duration.ofHours(6), LocalDateTime.now());
+        AbilityEffect wisdomWave = new AbilityEffect(AbilityType.WISDOM_WAVE, 50, Duration.ofHours(6), LocalDateTime.now(),
+                Duration.ofHours(24), // Cooldown, assuming 24 hours for simplicity
+                0  // Mana cost for the test, assuming 0 for simplicity
+        );
         user.setAbilityEffects(Collections.singletonList(wisdomWave));
 
         // Act
@@ -74,7 +105,7 @@ public class UserTest {
 
         // Assert
         assertEquals(150, intStat.getCurrentExp()); // Full boosted experience to INT stat
-        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+        assertEquals(150, user.getCurrentExp()); // Full of boosted experience to overall user level
     }
 
     @Test
@@ -85,7 +116,10 @@ public class UserTest {
         Task task = new Task();
         task.setType(StatType.AGI);
         task.setExperience(100); // Base experience
-        AbilityEffect NimbleMind = new AbilityEffect(AbilityType.NIMBLE_MIND, 50, Duration.ofHours(6), LocalDateTime.now());
+        AbilityEffect NimbleMind = new AbilityEffect(AbilityType.NIMBLE_MIND, 50, Duration.ofHours(6), LocalDateTime.now(),
+                Duration.ofHours(24), // Cooldown, assuming 24 hours for simplicity
+                0  // Mana cost for the test, assuming 0 for simplicity
+        );
         user.setAbilityEffects(Collections.singletonList(NimbleMind));
 
         // Act
@@ -93,7 +127,7 @@ public class UserTest {
 
         // Assert
         assertEquals(150, agiStat.getCurrentExp()); // Full boosted experience to INT stat
-        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+        assertEquals(150, user.getCurrentExp()); // Full of boosted experience to overall user level
     }
 
     @Test
@@ -104,7 +138,10 @@ public class UserTest {
         Task task = new Task();
         task.setType(StatType.STR);
         task.setExperience(100); // Base experience
-        AbilityEffect TitansGrip = new AbilityEffect(AbilityType.TITAN_S_GRIP, 50, Duration.ofHours(6), LocalDateTime.now());
+        AbilityEffect TitansGrip = new AbilityEffect(AbilityType.TITAN_S_GRIP, 50, Duration.ofHours(6), LocalDateTime.now(),
+                Duration.ofHours(24), // Cooldown, assuming 24 hours for simplicity
+                0  // Mana cost for the test, assuming 0 for simplicity
+        );
         user.setAbilityEffects(Collections.singletonList(TitansGrip));
 
         // Act
@@ -112,7 +149,7 @@ public class UserTest {
 
         // Assert
         assertEquals(150, strStat.getCurrentExp()); // Full boosted experience to INT stat
-        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+        assertEquals(150, user.getCurrentExp()); // Full of boosted experience to overall user level
     }
 
     @Test
@@ -123,7 +160,10 @@ public class UserTest {
         Task task = new Task();
         task.setType(StatType.VIT);
         task.setExperience(100); // Base experience
-        AbilityEffect LifeSBounty = new AbilityEffect(AbilityType.LIFE_S_BOUNTY, 50, Duration.ofHours(6), LocalDateTime.now());
+        AbilityEffect LifeSBounty = new AbilityEffect(AbilityType.LIFE_S_BOUNTY, 50, Duration.ofHours(6), LocalDateTime.now(),
+                Duration.ofHours(24), // Cooldown, assuming 24 hours for simplicity
+                0  // Mana cost for the test, assuming 0 for simplicity
+        );
         user.setAbilityEffects(Collections.singletonList(LifeSBounty));
 
         // Act
@@ -131,7 +171,7 @@ public class UserTest {
 
         // Assert
         assertEquals(150, vitStat.getCurrentExp()); // Full boosted experience to INT stat
-        assertEquals(75, user.getCurrentExp()); // Half of boosted experience to overall user level
+        assertEquals(150, user.getCurrentExp()); // Full of boosted experience to overall user level
     }
     @Test
     public void testSteadfastAbility() {
