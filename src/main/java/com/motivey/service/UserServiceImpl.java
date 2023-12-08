@@ -4,6 +4,7 @@ import com.motivey.dto.UserRegistrationDto;
 import com.motivey.enums.StatType;
 import com.motivey.exception.UserAlreadyExistsException;
 import com.motivey.model.*;
+import com.motivey.repository.ArmorTierRepository;
 import com.motivey.repository.RoleRepository;
 import com.motivey.repository.StatRepository;
 import com.motivey.repository.UserRepository;
@@ -31,6 +32,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private ArmorTierRepository armorTierRepository;
     @Override
     public User register(UserRegistrationDto registrationDto) {
         if (userRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
@@ -45,6 +48,12 @@ public class UserServiceImpl implements UserService {
         // Set a default role (e.g., "ROLE_USER") for the new user
         Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RuntimeException("User role not found"));
         user.setRole(userRole);
+
+        // Set the first armor from armor_tiers with id 1
+        ArmorTier firstArmor = armorTierRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("First armor tier not found"));
+        user.setCurrentArmor(firstArmor);
+
 
         user = userRepository.save(user); // Save the user to ensure it has an ID before creating stats
 
