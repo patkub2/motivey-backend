@@ -66,11 +66,15 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
 
-        // This can be a list of all tasks or filtered by the logged-in user
-        List<Task> tasks = taskRepository.findAll(); // or a custom method to find by user
+        User user = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        List<UserTask> userTasks = userTaskRepository.findByUserId(user.getId());
+        List<Task> tasks = userTasks.stream().map(UserTask::getTask).collect(Collectors.toList());
 
         return ResponseEntity.ok(tasks);
     }
+
     @PostMapping("/task/add")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

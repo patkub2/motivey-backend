@@ -12,4 +12,6 @@ import java.util.List;
 public interface UserTaskRepository extends JpaRepository<UserTask, UserTaskId> {
     // You can define custom query methods here if needed
     List<UserTask> findByUserIdAndTask_Section(Long userId, Section section);
+
+    List<UserTask> findByUserId(Long id);
 }
