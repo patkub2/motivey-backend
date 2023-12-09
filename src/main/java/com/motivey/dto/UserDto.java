@@ -20,6 +20,9 @@ public class UserDto {
     private Integer maxMana;
     private Integer currentMana;
     private String currentArmorId; // Only the armorId of the currentArmor
-
+    private StatDto intStat;
+    private StatDto strStat;
+    private StatDto agiStat;
+    private StatDto vitStat;
     // Constructors, Getters, and Setters
 }

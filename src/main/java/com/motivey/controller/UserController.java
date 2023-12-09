@@ -1,7 +1,9 @@
 package com.motivey.controller;
 
 
+import com.motivey.dto.StatDto;
 import com.motivey.dto.UserDto;
+import com.motivey.model.Stat;
 import com.motivey.model.User;
 import com.motivey.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,28 @@ public class UserController {
         dto.setMaxMana(user.getMaxMana());
         dto.setCurrentMana(user.getCurrentMana());
         dto.setCurrentArmorId(user.getCurrentArmor() != null ? user.getCurrentArmor().getArmorId() : null);
+
+        for (Stat stat : user.getStats()) {
+            StatDto statDto = new StatDto();
+            statDto.setLevel(stat.getLevel());
+            statDto.setCurrentExp(stat.getCurrentExp());
+            statDto.setMaxExp(stat.getMaxExp());
+
+            switch (stat.getId().getType()) {
+                case "INT":
+                    dto.setIntStat(statDto);
+                    break;
+                case "STR":
+                    dto.setStrStat(statDto);
+                    break;
+                case "AGI":
+                    dto.setAgiStat(statDto);
+                    break;
+                case "VIT":
+                    dto.setVitStat(statDto);
+                    break;
+            }
+        }
 
         return dto;
     }
