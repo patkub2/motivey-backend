@@ -53,6 +53,13 @@ public class AbilitiesManager {
         // Deduct mana cost
         user.setCurrentMana(user.getCurrentMana() - newEffect.getManaCost());
 
+        // Apply specific ability effects
+        if (newEffect.getAbilityType() == AbilityType.MIND_SURGE) {
+            applyMindSurgeAbility(user);
+        } else if (newEffect.getAbilityType() == AbilityType.STEADFAST) {
+            applySteadfastAbility(user);
+        }
+
         // If the ability already exists, update it, otherwise add a new one
         if (existingEffect != null) {
             existingEffect.setStartTime(now);
